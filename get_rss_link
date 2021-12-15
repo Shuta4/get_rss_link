@@ -1,0 +1,48 @@
+#!/usr/bin/python
+
+from bs4 import BeautifulSoup
+import requests
+import sys
+import pyperclip
+
+help_text = """
+Usage: get_rss_link [-h] [-c] <URL>
+Gets rss link by searching for `type="application/rss+xml"` tag on page.
+
+Options:
+    -h (--help): print help and exit.
+    -c (--copy): copy rss link to clipboard.
+""".strip()
+
+def main():
+    url = ""
+    copy = False
+
+    for i in range(1, len(sys.argv)):
+        a = sys.argv[i]
+
+        if a == '-h' or a == '--help':
+            print(help_text)
+            return
+
+        if a == '-c' or a == '--copy':
+            copy = True
+            continue
+
+        url = a
+
+    if url == '':
+        print('No url, exiting. For usage and help: --help.')
+        return
+
+    soup = BeautifulSoup(requests.get(url).text, features="lxml")
+    l = soup.find(type='application/rss+xml')
+    h = l.get('href')
+
+    if copy:
+        pyperclip.copy(h)
+    else:
+        print(h)
+
+
+main()
